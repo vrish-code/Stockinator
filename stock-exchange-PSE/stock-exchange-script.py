@@ -134,3 +134,27 @@ def buying_and_stats():
                     }
                 )
                 an.ani(bsto, True, False, True)
+    with c3:
+        st.subheader("Return percentage leaderboard.")
+        st.divider()
+        leader = []
+        retper = list(x["return_1yr_pct"] for x in st.session_state.stock_dict.values())
+        retpera = abs(y for y in retper)
+        retperasort = sorted(retpera, reverse=True)
+        del retper
+        del retpera
+        for x in range(len(st.session_state.tl)):
+            leader.append(st.session_state)
+        leaderdf = pd.DataFrame(leader.items(), columns=["Ticker", "Return percentage"])
+        st.dataframe(leaderdf)
+        st.divider()
+        g, h = plt.subplots()
+        g.set_facecolor = "#000"
+        h.patch.set_facecolor = "#fff"
+        h.barh(st.session_state.tl, retperasort, color="green")
+        h.grid(True, alpha=1.0, linestyle="-", linewidth=0.9, which="both")
+        h.set_title("Chart on stock with leading return percentage.")
+        h.set_ylabel("Stocks")
+        h.set_xlabel("Return percentages")
+        h.set_ylim(0, max(retperasort))
+        st.caption("All returns in INR")
