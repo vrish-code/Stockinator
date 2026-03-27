@@ -140,8 +140,7 @@ def buying_and_stats():
 
 
 def return_calc():
-    c1 = st.columns(1, border=True)
-    with c1:
+    with st.container(border=True):
         st.subheader("Return calculator")
         st.divider()
         stock_choice = st.selectbox(
