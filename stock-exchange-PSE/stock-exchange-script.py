@@ -199,8 +199,22 @@ def return_calc():
 def portfolio_and_selling():
     st.header("Portfolio")
     st.divider()
+    totalInvVar: float = 0.0
+    for l in range(len(st.session_state.bought_stocks)):
+        totalInvVar += (
+        st.session_state.bought_stocks[l]["Price (1 share)"]
+        * st.session_state.bought_stocks[l]["No of shares bought"]
+        )
     c1, c2 = st.columns(2, gap="large")
     with c1:
+        with st.expander("Total profit and loss"):
+            totpl = sum(
+                st.session_state.bought_stocks[l]["Price (1 share)"]
+                for l in range(st.session_state.bought_stocks)
+            ) * sum(st.session_state.bought_stocks[p]["No of shares"])-totalInvVar
+            st.metric("Total P&L (INR)", topl)
+        with st.expander()
+    with c2:
         with st.container():
             st.subheader("View the stocks you bought")
             st.divider()
@@ -209,12 +223,7 @@ def portfolio_and_selling():
             st.divider()
         with st.container():
             st.subheader("Total investement money")
-            totalInvVar: float = 0.0
-            for l in range(len(st.session_state.bought_stocks)):
-                totalInvVar += (
-                    st.session_state.bought_stocks[l]["Price (1 share)"]
-                    * st.session_state.bought_stocks[l]["No of shares bought"]
-                )
+            
             st.metric("Total investment in INR", totalInvVar)
             st.divider()
             st.subheader("Percentage of money in each stock")
@@ -267,47 +276,6 @@ def portfolio_and_selling():
             p.set_ylabel("Tickers")
             p.set_xlim(0, 100)
             st.pyplot(h)
-    with c2:
-        with st.container():
-            st.subheader("Total stock health")
-            st.divider()
-            c1, c2 = st.columns(2, gap="large")
-            with c1:
-                st.metric(
-                    """Current 
-                      market
-                      value""",
-                    (
-                        round(
-                            sum(
-                                st.session_state.bought_stocks[n]["Price (1 share)"]
-                                * st.session_state.bought_stocks[n][
-                                    "No of shares bought"
-                                ]
-                                for n in range(len(st.session_state.bought_stocks))
-                            )
-                        )
-                    ),
-                )
-                st.divider()
-                tpl = sum(
-                    st.session_state.bought_stocks[h]["Price (1 share)"]
-                    for h in range(len(st.session_state.bought_stocks))
-                )
-                st.metric(
-                    """Total P&L
-                     (all stocks)""",
-                    tpl - totalInvVar,
-                )
-            with c2:
-                st.metric(
-                    """Current value""",
-                    tpl
-                    * sum(
-                        st.session_state.bought_stocks[_]["No of shares bought"]
-                        for _ in range(len(st.session_state.bought_stocks))
-                    ),
-                )
 
 
 st.sidebar.title("Basic")
