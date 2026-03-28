@@ -118,7 +118,7 @@ def buying_and_stats():
         g, h = plt.subplots()
         g.set_facecolor = "#000"
         h.patch.set_facecolor = "#fff"
-        h.barh(st.session_state.tl, retperasort, color="green")
+        h.barh(tl, retperasort, color="green")
         h.grid(True, alpha=1.0, linestyle="-", linewidth=0.9, which="both")
         h.set_title("Chart on stock with leading return percentage.")
         h.set_ylabel("Stocks")
