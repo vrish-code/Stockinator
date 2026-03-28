@@ -4,6 +4,22 @@ import streamlit as st
 import pandas as pd
 import animate as an
 
+plt.style.use("dark_background")
+plt.rcParams.update(
+    {
+        "figure.facecolor": "#000000",
+        "axes.facecolor": "#000000",
+        "axes.edgecolor": "#FFFFFF",
+        "grid.color": "#FFFFFF",
+        "xtick.color": "#FFFFFF",
+        "ytick.color": "#FFFFFF",
+        "axes.labelcolor": "#FFFFFF",
+        "text.color": "#FFFFFF",
+        "lines.color": "#FFFFFF",
+        "patch.edgecolor": "#FFFFFF",
+    }
+)
+
 st.set_page_config(page_title="PSE Stock Simulator", layout="wide")
 
 if "stock_dict" not in st.session_state:
@@ -18,7 +34,7 @@ if "stock_dict" not in st.session_state:
             "name": "HDFC Bank Limited",
             "Price": 20780.45,
             "Return Percentage 1 yr": -11.75,
-            "history_6mo": [22500.0, 22100.4, 21800.6, 21200.3, 20950.8, 20780.45],
+            "6 month history": [22500.0, 22100.4, 21800.6, 21200.3, 20950.8, 20780.45],
         },
         "TCS": {
             "Name": "Tata Consultancy Services Limited",
@@ -53,10 +69,10 @@ if "stock_dict" not in st.session_state:
     }
 
 if "bought_stocks" not in st.session_state:
-    st.session_state.bought_stocks = {}
+    st.session_state.bought_stocks = []
 
 if "sold_stocks" not in st.session_state:
-    st.session_state.sold_stocks = {}
+    st.session_state.sold_stocks = []
 
 if "stock_df" not in st.session_state:
     df = pd.DataFrame.from_dict(st.session_state.stock_dict, orient="index")
@@ -67,9 +83,10 @@ if "stock_df" not in st.session_state:
 def buying_and_stats():
     tl = list(st.session_state.stock_dict.keys())
     pl = list(x["Price"] for x in st.session_state.stock_dict.values())
-    c1, c2 = st.columns(2, border=True)
+    c1, c2 = st.columns(2)
     with c1:
         st.subheader("Overview of stocks")
+        st.divider()
         st.dataframe(st.session_state.stock_df, hide_index=True)
         st.divider()
         f, a = plt.subplots()
@@ -103,32 +120,48 @@ def buying_and_stats():
     with c2:
         st.subheader("Buying market")
         st.divider()
-        with st.form(key="Buying"):
-            bsto = st.selectbox("Choose a stock to buy", tl)
-            s = st.form_submit_button("Buy")
-        if s:
-            st.session_state.bought_stocks.append(
-                {
-                    "Ticker": tl.index(bsto),
-                    "Data": st.session_state.stock_dict[bsto],
-                }
-            )
-            an.animation.ani(bsto, True, False, True)
-        st.divider()
+        retpr = [
+            abs(float(x["Return Percentage 1 yr"]))
+            for x in st.session_state.stock_dict.values()
+        ]
+        retPerSort = list(sorted(retpr, reverse=True))
         g, h = plt.subplots()
-        g.set_facecolor = "#000"
-        h.patch.set_facecolor = "#fff"
-        h.barh(tl, retperasort, color="green")
+        h.barh(tl, retPerSort, height=0.1, color="green")
         h.grid(True, alpha=1.0, linestyle="-", linewidth=0.9, which="both")
         h.set_title("Chart on stock with leading return percentage.")
         h.set_ylabel("Stocks")
         h.set_xlabel("Return percentages")
-        h.set_ylim(0, max(retperasort))
+        h.set_xlim(0, max(retPerSort))
+        st.pyplot(g)
+        st.divider()
         st.caption("All returns in INR")
+        st.divider()
+        with st.form(key="Buying"):
+            bsto = st.selectbox("Choose a stock to buy", tl)
+            noS = st.number_input(
+                "Choose the number of shares you want to buy", 1, 1000, 1
+            )
+            s = st.form_submit_button("Buy")
+        if s:
+            st.session_state.bought_stocks.append(
+                {
+                    "Ticker": tl[tl.index(bsto)],
+                    "Name": st.session_state.stock_dict[bsto]["Name"],
+                    "Price": st.session_state.stock_dict[bsto]["Price"],
+                    "Return Percentage 1 yr": st.session_state.stock_dict[bsto][
+                        "Return Percentage 1 yr"
+                    ],
+                    "6 month history": st.session_state.stock_dict[bsto][
+                        "6 month history"
+                    ],
+                    "No of shares bought": noS,
+                }
+            )
+            an.ani(True, True, False, bsto)
 
 
 def return_calc():
-    with st.container(border=True):
+    with st.container():
         st.subheader("Return calculator")
         st.divider()
         stock_choice = st.selectbox(
@@ -136,24 +169,83 @@ def return_calc():
         )
         st.divider()
         noShares = st.number_input(
-            "Choose the number of shares you want to buy", min=1, max=1000, step=1
+            "Choose the number of shares you want to buy", 1, 1000, 1
         )
         st.divider()
         st.write(
-            f"Return percentage for selected stock: {st.session_state.stock_dict[stock_choice]["Return percentage 1 yr"]}"
+            f"Return percentage (1 yr) for selected stock: {st.session_state.stock_dict[stock_choice]["Return Percentage 1 yr"]}"
         )
         st.divider()
         ret_output = (st.session_state.stock_dict[stock_choice]["Price"] * noShares) * (
-            st.session_state.stock_dict[stock_choice]["Return percentage 1 yr"] / 100
+            st.session_state.stock_dict[stock_choice]["Return Percentage 1 yr"] / 100
         )
         st.metric("Return output", f"₹{ret_output}")
         st.divider()
 
 
-with st.sidebar:
-    st.title("Sidebar")
-    func = st.selectbox("Choose", ["Buying and stats", "Return calc"])
-if func == "Buying and stats":
+def portfolio_and_selling():
+    st.subheader("Portfolio")
+    st.divider()
+    tl = list(st.session_state.stock_dict.keys())
+    with st.container():
+        st.subheader("View the stocks you bought")
+        st.divider()
+        boughtStocksDf = pd.DataFrame(st.session_state.bought_stocks)
+        st.dataframe(boughtStocksDf)
+        st.divider()
+    with st.container():
+        st.subheader("Total investement money")
+        st.divider()
+        totalInvVar: float = 0.0
+        for l in range(len(st.session_state.bought_stocks)):
+            totalInvVar += (
+                st.session_state.bought_stocks[l]["Price"]
+                * st.session_state.bought_stocks[l]["No of shares bought"]
+            )
+        st.metric("Total investment in INR", totalInvVar)
+        st.divider()
+        st.subheader("Percentage of money in each stock")
+
+        pctInvinEachStock = []
+        for o in range(len(st.session_state.bought_stocks)):
+            pctInvinEachStock.append(
+                {
+                    st.session_state.bought_stocks[o]["Ticker"]: (
+                        (
+                            st.session_state.bought_stocks[o]["Price"]
+                            * st.session_state.bought_stocks[o]["No of shares bought"]
+                        )
+                        / totalInvVar
+                    )
+                    * 100
+                }
+            )
+        pctInv = []
+        for g in range(len(st.session_state.bought_stocks)):
+            (
+                (
+                    st.session_state.bought_stocks[g]["Price"]
+                    * st.session_state.bought_stocks[g]["No of shares bought"]
+                )
+                / totalInvVar
+            ) * 100
+        pctInvDfj = pd.json_normalize(pctInvinEachStock)
+        pctInvDf = pd.DataFrame(pctInvDfj)
+        h, p = plt.subplots()
+        p.barh(tl, pctInv, color="green")
+        p.grid(
+            True, alpha=0.06, linestyle="-", linewidth=0.1, which="both", axis="both"
+        )
+        p.set_title(f"Percentages of total amount ({totalInvVar}) invested in stocks")
+        p.set_xlabel("Percentage")
+        p.set_ylabel("Tickers")
+        p.set_xlim(0, 100)
+        st.pyplot(h)
+
+
+st.sidebar.title("Basic")
+c = st.sidebar.selectbox("Choose", ["Buying and stats", "Portfolio and selling"])
+if c == "Buying and stats":
     buying_and_stats()
 else:
-    return_calc()
+    portfolio_and_selling()
