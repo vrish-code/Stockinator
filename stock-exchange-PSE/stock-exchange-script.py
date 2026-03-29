@@ -3,69 +3,72 @@ import random
 import streamlit as st
 import pandas as pd
 import animate as an
+import st_autorefresh
 
+st.set_page_config(
+    page_title="PSE Stock Simulator", layout="wide", initial_sidebar_state="expanded"
+)
+count = st_autorefresh(interval=5000, limit=100, key="refresher")
 plt.style.use("dark_background")
 plt.rcParams.update(
     {
         "figure.facecolor": "#000000",
         "axes.facecolor": "#000000",
-        "axes.edgecolor": "#FFFFFF",
-        "grid.color": "#FFFFFF",
+        "axes.edgecolor": "#808080",
+        "grid.color": "#808080",
         "xtick.color": "#FFFFFF",
         "ytick.color": "#FFFFFF",
-        "axes.labelcolor": "#FFFFFF",
+        "axes.labelcolor": "#808080",
         "text.color": "#FFFFFF",
         "lines.color": "#FFFFFF",
-        "patch.edgecolor": "#FFFFFF",
+        "patch.edgecolor": "#808080",
     }
 )
 
-st.set_page_config(
-    page_title="PSE Stock Simulator", layout="wide", initial_sidebar_state="expanded"
-)
-
+if "bank_account" not in st.session_state:
+    st.session_state.bank_account:float=0.0
 if "stock_dict" not in st.session_state:
     st.session_state.stock_dict = {
         "RELIANCE": {
             "Name": "Reliance Industries Limited",
-            "Price (1 share)": 21414.40,
-            "Return Percentage 1 yr": 13.30,
+            "Price (1 share)": 21414.40+random.choice(-100000,100000),
+            "Return Percentage 1 yr": 13.30-random.choice(-10,10),
             "6 month history": [20100.5, 20550.2, 20300.8, 20900.4, 21200.1, 21414.4],
         },
         "HDFCBANK": {
             "Name": "HDFC Bank Limited",
-            "Price (1 share)": 20780.45,
-            "Return Percentage 1 yr": -11.75,
+            "Price (1 share)": 20780.45-random.choice(-100000,100000),,
+            "Return Percentage 1 yr": -11.75+random.choice(-10,10),
             "6 month history": [22500.0, 22100.4, 21800.6, 21200.3, 20950.8, 20780.45],
         },
         "TCS": {
             "Name": "Tata Consultancy Services Limited",
-            "Price (1 share)": 22390.60,
-            "Return Percentage 1 yr": 1.41,
+            "Price (1 share)": 22390.60+random.choice(-100000,100000),,
+            "Return Percentage 1 yr": 1.41-random.choice(-10,10),
             "6 month history": [22100.2, 22250.5, 22050.1, 22400.9, 22300.4, 22390.6],
         },
         "ICICIBANK": {
             "Name": "ICICI Bank Limited",
-            "Price (1 share)": 21245.40,
-            "Return Percentage 1 yr": 18.20,
+            "Price (1 share)": 21245.40-random.choice(-100000,100000),,
+            "Return Percentage 1 yr": 18.20+random.choice(-10,10),
             "6 month history": [18500.4, 19200.8, 19850.2, 20400.6, 20900.1, 21245.4],
         },
         "INFY": {
             "Name": "Infosys Limited",
-            "Price (1 share)": 21255.90,
-            "Return Percentage 1 yr": 5.40,
+            "Price (1 share)": 21255.90+random.choice(-100000,100000),,
+            "Return Percentage 1 yr": 5.40-random.choice(-10,10),
             "6 month history": [20200.1, 20500.4, 20850.7, 21000.3, 21150.9, 21255.9],
         },
         "SBIN": {
             "Name": "State Bank of India",
-            "Price (1 share)": 21058.00,
-            "Return Percentage 1 yr": 31.40,
+            "Price (1 share)": 21058.00-random.choice(-100000,100000),,
+            "Return Percentage 1 yr": 31.40+random.choice(-10,10),
             "6 month history": [16500.5, 17800.2, 18900.8, 19700.4, 20500.1, 21058.0],
         },
         "BHARTIARTL": {
             "Name": "Bharti Airtel Limited",
-            "Price (1 share)": 21846.10,
-            "Return Percentage 1 yr": 42.10,
+            "Price (1 share)": 21846.10+random.choice(-100000,100000),,
+            "Return Percentage 1 yr": 42.10-random.choice(-10,10),
             "6 month history": [15800.2, 17200.5, 18500.1, 19900.9, 21000.4, 21846.1],
         },
     }
@@ -85,7 +88,7 @@ if "stock_df" not in st.session_state:
 def buying_and_stats():
     tl = list(st.session_state.stock_dict.keys())
     pl = list(x["Price (1 share)"] for x in st.session_state.stock_dict.values())
-    c1, c2 = st.columns(2)
+    c1, c2 = st.columns([4, 3])
     with c1:
         st.subheader("Overview of stocks")
         st.divider()
@@ -94,7 +97,7 @@ def buying_and_stats():
         f, a = plt.subplots()
         a.barh(tl, pl, color="green")
         a.grid(
-            True, alpha=1.0, linewidth=0.9, linestyle="-", which="both", color="#fff"
+            True, alpha=1.0, linewidth=0.5, linestyle="-", which="both", color="#fff"
         )
         a.set_xlim(0, 50000)
         a.set_title("Chart on prices of stocks")
@@ -104,21 +107,7 @@ def buying_and_stats():
         st.divider()
         st.caption("All prices in INR")
         st.divider()
-        t1, t2, t3, t4, t5, t6, t7 = st.tabs(tl)
-        with t1:
-            st.line_chart(st.session_state.stock_dict[tl[0]].get("6 month history"))
-        with t2:
-            st.line_chart(st.session_state.stock_dict[tl[1]].get("6 month history"))
-        with t3:
-            st.line_chart(st.session_state.stock_dict[tl[2]].get("6 month history"))
-        with t4:
-            st.line_chart(st.session_state.stock_dict[tl[3]].get("6 month history"))
-        with t5:
-            st.line_chart(st.session_state.stock_dict[tl[4]].get("6 month history"))
-        with t6:
-            st.line_chart(st.session_state.stock_dict[tl[5]].get("6 month history"))
-        with t7:
-            st.line_chart(st.session_state.stock_dict[tl[6]].get("6 month history"))
+
     with c2:
         st.subheader("Buying market")
         st.divider()
@@ -171,6 +160,22 @@ def buying_and_stats():
                 }
             )
             an.ani(True, True, False, bsto)
+    with st.container():
+        t1, t2, t3, t4, t5, t6, t7 = st.tabs(tl)
+        with t1:
+            st.line_chart(st.session_state.stock_dict[tl[0]].get("6 month history"))
+        with t2:
+            st.line_chart(st.session_state.stock_dict[tl[1]].get("6 month history"))
+        with t3:
+            st.line_chart(st.session_state.stock_dict[tl[2]].get("6 month history"))
+        with t4:
+            st.line_chart(st.session_state.stock_dict[tl[3]].get("6 month history"))
+        with t5:
+            st.line_chart(st.session_state.stock_dict[tl[4]].get("6 month history"))
+        with t6:
+            st.line_chart(st.session_state.stock_dict[tl[5]].get("6 month history"))
+        with t7:
+            st.line_chart(st.session_state.stock_dict[tl[6]].get("6 month history"))
 
 
 def return_calc():
@@ -199,83 +204,19 @@ def return_calc():
 def portfolio_and_selling():
     st.header("Portfolio")
     st.divider()
-    totalInvVar: float = 0.0
-    for l in range(len(st.session_state.bought_stocks)):
-        totalInvVar += (
-        st.session_state.bought_stocks[l]["Price (1 share)"]
-        * st.session_state.bought_stocks[l]["No of shares bought"]
-        )
-    c1, c2 = st.columns(2, gap="large")
+    totInv=float(sum(st.session_state.bought_stocks[a]["Price (1 share)"] for a in range(len(st.session_state.bought_stocks)))*
+    sum(st.session_state.bought_stocks[b]["No of shares bought"] for b in range(len(st.session_state.bought_stocks))))
+    totPL=totInv-sum(st.session_state.bought_stocks[o]["Price (1 share)"] for o in range(len(st.session_state.bought_stocks)))
+    with st.container():
+        c1,c2,c3,c4=st.columns(4, gap=large)
+        with c1:
+            with st.expander("Total investement made"):
+                st.metric("Total investment", f"{totaInv:.2f} INR" )
+            with st.expander("Total profit/loss"):
+                st.metric("Total P/L", f"{totPL:.2f} INR", totPL/totInv*100)
+    c1,c2,c3=st.columns(3, gap="large")
     with c1:
-        with st.expander("Total profit and loss"):
-            totpl = sum(
-                st.session_state.bought_stocks[l]["Price (1 share)"]
-                for l in range(st.session_state.bought_stocks)
-            ) * sum(st.session_state.bought_stocks[p]["No of shares"])-totalInvVar
-            st.metric("Total P&L (INR)", topl)
-        with st.expander()
-    with c2:
-        with st.container():
-            st.subheader("View the stocks you bought")
-            st.divider()
-            boughtStocksDf = pd.DataFrame(st.session_state.bought_stocks)
-            st.dataframe(boughtStocksDf, hide_index=True)
-            st.divider()
-        with st.container():
-            st.subheader("Total investement money")
-            
-            st.metric("Total investment in INR", totalInvVar)
-            st.divider()
-            st.subheader("Percentage of money in each stock")
 
-            pctInvinEachStock = []
-            for o in range(len(st.session_state.bought_stocks)):
-                pctInvinEachStock.append(
-                    {
-                        st.session_state.bought_stocks[o]["Ticker"]: (
-                            (
-                                st.session_state.bought_stocks[o]["Price (1 share)"]
-                                * st.session_state.bought_stocks[o][
-                                    "No of shares bought"
-                                ]
-                            )
-                            / totalInvVar
-                        )
-                        * 100
-                    }
-                )
-            pctInv = []
-            for g in range(len(st.session_state.bought_stocks)):
-                pctInv.append(
-                    (
-                        (
-                            st.session_state.bought_stocks[g]["Price (1 share)"]
-                            * st.session_state.bought_stocks[g]["No of shares bought"]
-                        )
-                        / totalInvVar
-                    )
-                    * 100
-                )
-            bst = [x["Ticker"] for x in st.session_state.bought_stocks]
-            pctInvDfj = pd.json_normalize(pctInvinEachStock)
-            pctInvDf = pd.DataFrame(pctInvDfj)
-            h, p = plt.subplots(figsize=(12, 6))
-            p.barh(bst, pctInv, color="green")
-            p.grid(
-                True,
-                alpha=0.06,
-                linestyle="-",
-                linewidth=0.1,
-                which="both",
-                axis="both",
-            )
-            p.set_title(
-                f"Percentages of total amount ({totalInvVar}) invested in stocks"
-            )
-            p.set_xlabel("Percentage")
-            p.set_ylabel("Tickers")
-            p.set_xlim(0, 100)
-            st.pyplot(h)
 
 
 st.sidebar.title("Basic")
