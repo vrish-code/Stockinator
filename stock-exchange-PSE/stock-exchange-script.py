@@ -3,72 +3,71 @@ import random
 import streamlit as st
 import pandas as pd
 import animate as an
-import st_autorefresh
+
 
 st.set_page_config(
     page_title="PSE Stock Simulator", layout="wide", initial_sidebar_state="expanded"
 )
-count = st_autorefresh(interval=5000, limit=100, key="refresher")
 plt.style.use("dark_background")
 plt.rcParams.update(
     {
-        "figure.facecolor": "#000000",
-        "axes.facecolor": "#000000",
-        "axes.edgecolor": "#808080",
-        "grid.color": "#808080",
-        "xtick.color": "#FFFFFF",
-        "ytick.color": "#FFFFFF",
-        "axes.labelcolor": "#808080",
-        "text.color": "#FFFFFF",
-        "lines.color": "#FFFFFF",
-        "patch.edgecolor": "#808080",
+        "figure.facecolor": "#002b36",
+        "axes.facecolor": "#073642",
+        "axes.edgecolor": "#586e75",
+        "grid.color": "#586e75",
+        "xtick.color": "#839496",
+        "ytick.color": "#839496",
+        "axes.labelcolor": "#839496",
+        "text.color": "#839496",
+        "lines.color": "#268bd2",
+        "patch.edgecolor": "#839496",
     }
 )
 
 if "bank_account" not in st.session_state:
-    st.session_state.bank_account:float=0.0
+    st.session_state.bank_account: float = 0.0
 if "stock_dict" not in st.session_state:
     st.session_state.stock_dict = {
         "RELIANCE": {
             "Name": "Reliance Industries Limited",
-            "Price (1 share)": 21414.40+random.choice(-100000,100000),
-            "Return Percentage 1 yr": 13.30-random.choice(-10,10),
+            "Price (1 share)": 21414.40 + random.randint(100, 100000),
+            "Return Percentage 1 yr": 13.30 - random.randint(-10, 10),
             "6 month history": [20100.5, 20550.2, 20300.8, 20900.4, 21200.1, 21414.4],
         },
         "HDFCBANK": {
             "Name": "HDFC Bank Limited",
-            "Price (1 share)": 20780.45-random.choice(-100000,100000),,
-            "Return Percentage 1 yr": -11.75+random.choice(-10,10),
+            "Price (1 share)": 20780.45 - random.randint(100, 100000),
+            "Return Percentage 1 yr": -11.75 + random.randint(-10, 10),
             "6 month history": [22500.0, 22100.4, 21800.6, 21200.3, 20950.8, 20780.45],
         },
         "TCS": {
             "Name": "Tata Consultancy Services Limited",
-            "Price (1 share)": 22390.60+random.choice(-100000,100000),,
-            "Return Percentage 1 yr": 1.41-random.choice(-10,10),
+            "Price (1 share)": 22390.60 + random.randint(100, 100000),
+            "Return Percentage 1 yr": 1.41 - random.randint(-10, 10),
             "6 month history": [22100.2, 22250.5, 22050.1, 22400.9, 22300.4, 22390.6],
         },
         "ICICIBANK": {
             "Name": "ICICI Bank Limited",
-            "Price (1 share)": 21245.40-random.choice(-100000,100000),,
-            "Return Percentage 1 yr": 18.20+random.choice(-10,10),
+            "Price (1 share)": 21245.40 - random.randint(100, 100000),
+            "Return Percentage 1 yr": 18.20 + random.randint(-10, 10),
             "6 month history": [18500.4, 19200.8, 19850.2, 20400.6, 20900.1, 21245.4],
         },
         "INFY": {
             "Name": "Infosys Limited",
-            "Price (1 share)": 21255.90+random.choice(-100000,100000),,
-            "Return Percentage 1 yr": 5.40-random.choice(-10,10),
+            "Price (1 share)": 21255.90 + random.randint(100, 100000),
+            "Return Percentage 1 yr": 5.40 - random.randint(-10, 10),
             "6 month history": [20200.1, 20500.4, 20850.7, 21000.3, 21150.9, 21255.9],
         },
         "SBIN": {
             "Name": "State Bank of India",
-            "Price (1 share)": 21058.00-random.choice(-100000,100000),,
-            "Return Percentage 1 yr": 31.40+random.choice(-10,10),
+            "Price (1 share)": 21058.00 - random.randint(100, 100000),
+            "Return Percentage 1 yr": 31.40 + random.randint(-10, 10),
             "6 month history": [16500.5, 17800.2, 18900.8, 19700.4, 20500.1, 21058.0],
         },
         "BHARTIARTL": {
             "Name": "Bharti Airtel Limited",
-            "Price (1 share)": 21846.10+random.choice(-100000,100000),,
-            "Return Percentage 1 yr": 42.10-random.choice(-10,10),
+            "Price (1 share)": 21846.10 + random.randint(100, 100000),
+            "Return Percentage 1 yr": 42.10 - random.randint(-10, 10),
             "6 month history": [15800.2, 17200.5, 18500.1, 19900.9, 21000.4, 21846.1],
         },
     }
@@ -95,7 +94,7 @@ def buying_and_stats():
         st.dataframe(st.session_state.stock_df, hide_index=True)
         st.divider()
         f, a = plt.subplots()
-        a.barh(tl, pl, color="green")
+        a.barh(tl, pl, color="#00FFFF")
         a.grid(
             True, alpha=1.0, linewidth=0.5, linestyle="-", which="both", color="#fff"
         )
@@ -125,9 +124,18 @@ def buying_and_stats():
             ),
             retPerSort,
             height=0.1,
-            color="green",
+            color="#00FFFF",
         )
-        h.grid(True, alpha=1.0, linestyle="-", linewidth=0.9, which="both")
+        h.grid(
+            True,
+            which="both",
+            axis="both",
+            alpha=1.0,
+            linewidth=0.8,
+            linestyle="-",
+            aa=True,
+            color="#fff",
+        )
         h.set_title("Chart on stock with leading return percentage.")
         h.set_ylabel("Stocks")
         h.set_xlabel("Return percentages")
@@ -142,6 +150,9 @@ def buying_and_stats():
                 "Choose the number of shares you want to buy", 1, 1000, 1
             )
             s = st.form_submit_button("Buy")
+            st.warning(
+                "Do not click the same stock on the dropdown and the buy button twice or more."
+            )
         if s:
             st.session_state.bought_stocks.append(
                 {
@@ -160,6 +171,7 @@ def buying_and_stats():
                 }
             )
             an.ani(True, True, False, bsto)
+
     with st.container():
         t1, t2, t3, t4, t5, t6, t7 = st.tabs(tl)
         with t1:
@@ -204,24 +216,103 @@ def return_calc():
 def portfolio_and_selling():
     st.header("Portfolio")
     st.divider()
-    totInv=float(sum(st.session_state.bought_stocks[a]["Price (1 share)"] for a in range(len(st.session_state.bought_stocks)))*
-    sum(st.session_state.bought_stocks[b]["No of shares bought"] for b in range(len(st.session_state.bought_stocks))))
-    totPL=totInv-sum(st.session_state.bought_stocks[o]["Price (1 share)"] for o in range(len(st.session_state.bought_stocks)))
-    with st.container():
-        c1,c2,c3,c4=st.columns(4, gap=large)
+    totInv = float(
+        sum(
+            st.session_state.bought_stocks[a]["Price (1 share)"]
+            for a in range(len(st.session_state.bought_stocks))
+        )
+        * sum(
+            st.session_state.bought_stocks[b]["No of shares bought"]
+            for b in range(len(st.session_state.bought_stocks))
+        )
+    )
+    totPL = totInv - sum(
+        st.session_state.bought_stocks[o]["Price (1 share)"]
+        for o in range(len(st.session_state.bought_stocks))
+    )
+    with st.container(key="overview_data"):
+        c1, c2 = st.columns(2, gap="large")
         with c1:
             with st.expander("Total investement made"):
-                st.metric("Total investment", f"{totaInv:.2f} INR" )
+                st.metric("Total investment", f"{totInv:.2f} INR")
             with st.expander("Total profit/loss"):
-                st.metric("Total P/L", f"{totPL:.2f} INR", totPL/totInv*100)
-    c1,c2,c3=st.columns(3, gap="large")
-    with c1:
+                st.metric(
+                    "Total P/L", f"{totPL:.2f} INR", f"{totPL / totInv * 100:.2f}%"
+                )
+        with c2:
+            with st.expander("Total returns"):
+                tabs = st.tabs(
+                    list(
+                        st.session_state.bought_stocks[p].get("Ticker")
+                        for p in range(len(st.session_state.bought_stocks))
+                    )
+                )
+                for o, p in enumerate(tabs):
+                    with p:
+                        st.metric(
+                            f"{st.session_state.bought_stocks[o]["Ticker"]}",
+                            f"{st.session_state.bought_stocks[o]["Return Percentage 1 yr"]*st.session_state.bought_stocks[o]["No of shares bought"]:.2f}%",
+                        )
+            with st.expander("Total shares bought for each stock"):
+                tabs = st.tabs(
+                    list(
+                        st.session_state.bought_stocks[p].get("Ticker")
+                        for p in range(len(st.session_state.bought_stocks))
+                    )
+                )
+                for i, t in enumerate(tabs):
+                    with t:
+                        st.metric(
+                            f"No of shares bought for {st.session_state.bought_stocks[i]["Ticker"]}",
+                            st.session_state.bought_stocks[i]["No of shares bought"],
+                        )
+    st.divider()
+    with st.container(key="portWeight"):
+        poWeightDict = {}
+        for y in range(len(st.session_state.bought_stocks)):
+            poWeightDict[st.session_state.bought_stocks[y]["Ticker"]] = round(
+                (
+                    st.session_state.bought_stocks[y]["Price (1 share)"]
+                    * st.session_state.bought_stocks[y]["No of shares bought"]
+                    / totInv
+                    * 100
+                ),
+                2,
+            )
+
+        poWeightDf = pd.DataFrame(
+            list(poWeightDict.items()), columns=["Tickers", "Share owned in portfolio"]
+        )
+        st.dataframe(poWeightDf, hide_index=True)
+
+        j, k = plt.subplots()
+        k.barh(
+            list(poWeightDict.keys()),
+            list(poWeightDict.values()),
+            height=0.3,
+            color="#00FFFF",
+        )
+        k.grid(
+            True,
+            which="both",
+            axis="both",
+            alpha=1.0,
+            linewidth=0.8,
+            linestyle="-",
+            aa=True,
+            color="#fff",
+        )
+        k.set_xlim(0, 100)
+        k.set_xlabel("Percentages of portfolio owned")
+        k.set_ylabel("Stocks owned")
+        st.pyplot(j)
+    c1, c2, c3 = st.columns(3)
 
 
-
-st.sidebar.title("Basic")
-c = st.sidebar.selectbox("Choose", ["Buying and stats", "Portfolio and selling"])
-if c == "Buying and stats":
+with st.sidebar:
+    st.title("haha")
+    s = st.selectbox("Choose", ["1", "2"])
+if s == "1":
     buying_and_stats()
 else:
     portfolio_and_selling()
