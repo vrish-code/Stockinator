@@ -19,8 +19,15 @@
 [data-testid="stSidebar"] {
     background-color: "#268bd2";
     color: "#b58900";
+    padding: 30px;
     font-family: "Consolas", "Courier New", monospace;
     font-size: 20px;
     border: 20px #dc322f solid !important;
     border-radius: 10px;
+}
+
+[data-testid="stColumn"] {
+    background-color: "#5e98bf";
+    color: "#7acfab";
+    border: 20px
 }
