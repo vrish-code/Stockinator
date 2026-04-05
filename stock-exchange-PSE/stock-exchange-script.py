@@ -8,6 +8,7 @@ import animate as an
 st.set_page_config(
     page_title="PSE Stock Simulator", layout="wide", initial_sidebar_state="expanded"
 )
+
 plt.style.use("dark_background")
 plt.rcParams.update(
     {
