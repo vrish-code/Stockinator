@@ -3,7 +3,7 @@ import random
 import streamlit as st
 import pandas as pd
 import animate as an
-
+import requests as r
 
 st.set_page_config(
     page_title="PSE Stock Simulator",
@@ -126,7 +126,9 @@ if "stock_dict" not in st.session_state:
 if "bought_stocks" not in st.session_state:
     st.session_state.bought_stocks = {}
 if "bankAcc" not in st.session_state:
-    st.session_state.bankAcc = {"Balance": 100000000 + random.randint(10000, -100000)}
+    st.session_state.bankAcc = {
+        "Balance": 100000000.676767 + random.randint(10000, -100000)
+    }
 if "demat" not in st.session_state:
     st.session_state.dematAcc = {}
 if "sold_stocks" not in st.session_state:
@@ -297,6 +299,20 @@ def buying_and_stats():
                     ],
                     "No of shares bought": noS,
                 }
+                st.session_state.demat[buyStock] += (
+                    st.session_state.stock_dict[buyStock]["Price (1 share)"]
+                    * st.session_state.bought_stocks[buyStock]["No of shares bought"]
+                ) * (
+                    st.session_state.stock_dict[buyStock]["Return Percentage 1 yr"]
+                    / 100
+                ) + (
+                    st.session_state.stock_dict[buyStock]["Price (1 share)"]
+                    * st.session_state.bought_stocks[buyStock]["No of shares bought"]
+                )
+                st.session_state.bankAcc["Balance"] -= st.session_state.stock_dict[
+                    buyStock
+                ]["Price (1 share)"]
+                * st.session_state.bought_stocks[buyStock]["No of shares bought"]
 
                 an.ani(True, True, False, buyStock)
 
@@ -380,31 +396,19 @@ def portfolio_and_selling():
         totInv = float(
             sum(
                 st.session_state.bought_stocks[a]["Price (1 share)"]
+                * st.session_state.bought_stocks[a]["No of shares bought"]
                 for a in st.session_state.bought_stocks
             )
-            * sum(
-                st.session_state.bought_stocks[b]["No of shares bought"]
-                for b in st.session_state.bought_stocks
-            )
         )
-
-        totRet = (
-            sum(
-                st.session_state.bought_stocks[p]["Return percentage 1 yr"]
-                for p in st.session_state.bought_stocks
-            )
-            * sum(
-                st.session_state_bought_stocks[i]["No of shares bought"]
-                for i in st.session_state.bought_stocks
-            )
-            / sum(
-                st.session_state_bought_stocks[l]["No of shares bought"]
-                for l in st.session_state.bought_stocks
-            )
+        totPL = sum(
+            s["Return Percentage 1 yr"]
+            / 100
+            * s["Price (1 share)"]
+            * s["No of shares bought"]
+            for s in st.session_state.bought_stocks.values()
         )
-        totPL = totRet / 100 * totInv
+        totRet = totPL / totInv * 100
         totPortVal = totInv + totPL
-        realisedPL = 0.00
 
         with st.container("Quick data overview"):
             with st.expander("Total Invested Money"):
@@ -416,9 +420,13 @@ def portfolio_and_selling():
             with st.expander("Total Realised P/L"):
                 st.metric("Total Realised P/L", f"{realisedPL:.2f} INR")
             with st.expander("Bank account balance"):
-                st.metric("Bank account", f"{st.session_state.bankAcc} INR")
+                st.metric("Bank account", f"{st.session_state.bankAcc["Balance"]} INR")
             with st.expander("Demat account"):
-                st.metric("Demat account", f"{st.session_state.dematAcc}")
+                Tabs = st.tabs(list(st.session_state.bought_stocks.keys()))
+                for t in enumerate(Tabs):
+                    for i in st.session_state.demat:
+                        with t:
+                            st.metric(f"Total demat holding for {st.session_state.demat[i]}", )
         c1, c2 = st.columns(2, border=True, gap="large")
         with c1:
             st.subheader("Stock overview")
@@ -435,8 +443,7 @@ def portfolio_and_selling():
             with st.container(border=True):
                 tAbs = st.tabs(
                     list(
-                        st.session_state.bought_stocks[x]["Ticker"]
-                        for x in st.session_state.bought_stocks
+                      st.session_state.bought_stocks.keys()
                     )
                 )
 
@@ -467,6 +474,10 @@ def portfolio_and_selling():
                         st.session_state.sold_stocks[sellStock] = (
                             st.session_state.bought_stocks[sellStock]
                         )
+                        st.session_state.bankAcc["Balance"] += st.session_state.demat[
+                            sellStock
+                        ]
+                        st.session_state.dematAcc[sellStock] = 0.000
                         del st.session_state.bought_stocks[sellStock]
                     else:
                         st.session_state.bought_stocks[sellStock][
@@ -478,16 +489,29 @@ def portfolio_and_selling():
                         st.session_state.sold_stocks[sellStock][
                             "No of shares bought"
                         ] = noS
+                        st.session_state.bankAcc["Balance"] += (
+                            st.session_state.bought_stocks[sellStock]["Price"]
+                            * noS
+                            * (
+                                st.session_state.bought_stocks[sellStock][
+                                    "Return percentage 1 yr"
+                                ]
+                                / 100
+                            )
+                        )
+                        st.session_state.demat[sellStock] -= (
+                            st.session_state.bought_stocks[sellStock]["Price"] * noS
+                        )
 
     else:
         st.error("No stocks bought!")
 
 
-with st.sidebar:
-    st.title("haha")
-    s = st.selectbox("Choose", ["1", "2"])
+def chatbot():
+    API_KEY=st.secrets["CHATBOT_API_KEY"]
+    with st.container(border=True):
+            prompt=st.text_input("Enter a prompt")
+            send=st.button("Send")
+    with st.container(border=True):
+        
 
-if s == "1":
-    buying_and_stats()
-else:
-    portfolio_and_selling()
