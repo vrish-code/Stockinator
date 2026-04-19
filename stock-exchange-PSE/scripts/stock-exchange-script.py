@@ -130,7 +130,7 @@ if "bankAcc" not in st.session_state:
         "Balance": 100000000.676767 + random.randint(-10000, 100000)
     }
 if "demat" not in st.session_state:
-    st.session_state.demat = 0.00
+    st.session_state.demat = {}
 if "sold_stocks" not in st.session_state:
     st.session_state.sold_stocks = {}
 
@@ -287,21 +287,22 @@ def buying_and_stats():
             if s:
                 st.session_state.bought_stocks[buyStock] = st.session_state.stock_dict[
                     buyStock
-                ]
+                ].copy()
                 st.session_state.bought_stocks[buyStock]["No of shares bought"] = noS
-                st.session_state.demat += (
+                st.session_state.demat[buyStock] = 0
+                st.session_state.demat[buyStock] += (
                     st.session_state.stock_dict[buyStock]["Price (1 share)"] * noS
                 ) * (
                     st.session_state.stock_dict[buyStock]["Return Percentage 1 yr"]
                     / 100
                 ) + (
-                    st.session_state.stock_dict[buyStock]["Price (1 share)"]
-                    * st.session_state.bought_stocks[buyStock]["No of shares bought"]
+                    st.session_state.stock_dict[buyStock]["Price (1 share)"] * noS
                 )
                 st.session_state.bankAcc["Balance"] -= (
                     st.session_state.stock_dict[buyStock]["Price (1 share)"]
                     * st.session_state.bought_stocks[buyStock]["No of shares bought"]
                 )
+                st.success(f"You bought {buyStock}!")
 
     with st.container(border=True):
         t1, t2, t3, t4, t5, t6, t7 = st.tabs(tl)
@@ -376,6 +377,34 @@ def return_calc():
         st.divider()
 
 
+def chatbot():
+    with open(
+        r"C:\Users\karth\OneDrive\Desktop\apikey.json", "r", encoding="utf-8"
+    ) as f:
+        API_KEY = json.load(f)["api-key"]
+    with st.container(border=True):
+        prompt = st.chat_input("Enter a prompt")
+    realPrompt = f"Stock dict:{st.session_state.stock_dict}, Bought stocks: {st.session_state.bought_stocks}, Sold stocks: {st.session_state.sold_stocks}, bank account: {st.session_state.bankAcc}, demat account: {st.session_state.demat}, {prompt}"
+    with st.container(border=True):
+        with st.chat_message("Stockinator.ai", avatar="🤖"):
+            st.write("How can I help you?")
+        with st.chat_message(st.session_state.name, avatar="👤"):
+            st.write(prompt)
+        resp = r.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "openrouter/free",
+                "messages": [{"role": "user", "content": realPrompt}],
+            },
+        )
+        with st.chat_message("Stockinator.ai"):
+            st.write(f"{resp.json()['choices'][0]['message']['content']}")
+
+
 def portfolio_and_selling():
     st.header("Portfolio")
     st.divider()
@@ -410,9 +439,14 @@ def portfolio_and_selling():
                     "Total Realised P/L", f"{st.session_state.realisedPL:.2f} INR"
                 )
             with st.expander("Bank account balance"):
-                st.metric("Bank account", f"{st.session_state.bankAcc["Balance"]} INR")
+                dTL = list(st.session_state.demat.keys())
+                T = st.tabs(dTL)
+                for t in T:
+                    for i in range(len(dTL)):
+                        with t:
+                            st.metric(f"Demat holding for {dTL[i]}")
             with st.expander("Demat account"):
-                st.metric("Total demat holdings", st.session_state.demat)
+                st.json(st.session_state.demat)
         c1, c2 = st.columns(2, border=True, gap="large")
         with c1:
             st.subheader("Stock overview")
@@ -423,7 +457,10 @@ def portfolio_and_selling():
                     with st.container(border=True):
                         st.subheader(sList[sList.index(i)])
                         bSDf = pd.DataFrame(
-                            list(st.session_state.bought_stocks[i].items())
+                            list(
+                                st.session_state.bought_stocks[i].items(),
+                            ),
+                            columns=["Categories", "Details"],
                         )
                         st.dataframe(bSDf, hide_index=True)
             with st.container(border=True):
@@ -434,35 +471,77 @@ def portfolio_and_selling():
                         )
         with c2:
             st.subheader("Selling")
-            with st.container(border=True)
+            with st.container(border=True):
+                sellStock = st.selectbox(
+                    "Choose a stock to sell",
+                    list(st.session_state.bought_stocks.keys()),
+                )
+                noS = st.number_input(
+                    "How many shares do you want to sell?",
+                    1,
+                    st.session_state.bought_stocks[sellStock]["No of shares bought"],
+                )
+                sellConf = st.button("Sell")
+                if sellConf:
+                    if (
+                        noS
+                        == st.session_state.bought_stocks[sellStock][
+                            "No of shares bought"
+                        ]
+                    ):
+                        st.session_state.sold_stocks[sellStock] = (
+                            st.session_state.bought_stocks[sellStock]
+                        )
+                        del st.session_state_bought_stocks[sellStock]
+                        st.session_state.bankAcc["Balance"] += st.session_state.demat[
+                            sellStock
+                        ]
+                        st.success(f"You sold {sellStock}!")
+                    if noS != st.session_state.bought_stocks[sellStock]["No of shares"]:
+                        st.session_state.bought_stocks["No of shares bought"] -= noS
+                        st.session_state.sold_stocks[sellStock] = (
+                            st.session_state.bought_stocks[sellStock]
+                        )
+                        st.session_state.sold_stocks[sellStock][
+                            "No of shares bought"
+                        ] = noS
+                        st.session_state.bankAcc += (
+                            st.session_state.bought_stocks[sellStock]["Price (1 share)"]
+                            * noS
+                        ) * (
+                            st.session_state.bought_stocks[sellStock][
+                                "Return Percentage 1 yr"
+                            ]
+                            / 100
+                        ) + (
+                            st.session_state.bought_stocks[sellStock]["Price (1 share)"]
+                            * noS
+                        )
+                        st.session_state.demat[sellStock] = 0
+                        st.session_state.demat[sellStock] = (
+                            (
+                                st.session_state.bought_stocks[sellStock][
+                                    "Price (1 share)"
+                                ]
+                                * noS
+                            )
+                            * (
+                                st.session_state.bought_stocks[sellStock][
+                                    "Return Percentage 1 yr"
+                                ]
+                                / 100
+                            )
+                            + (
+                                st.session_state.bought_stocks[sellStock][
+                                    "Price (1 share)"
+                                ]
+                                * noS
+                            )
+                            - noS
+                        )
 
     else:
         st.error("No stocks bought!")
-
-
-def chatbot():
-    API_KEY = os.environ.get("API-KEY")
-    with st.container(border=True):
-        prompt = st.chat_input("Enter a prompt")
-    realPrompt = f"Stock dict:{st.session_state.stock_dict}, Bought stocks: {st.session_state.bought_stocks}, Sold stocks: {st.session_state.sold_stocks}, bank account: {st.session_state.bankAcc}, demat account: {st.session_state.demat}, {prompt}"
-    with st.container(border=True):
-        with st.chat_message("Stockinator.ai"):
-            st.write("How can I help you?")
-        with st.chat_message(st.session_state.name):
-            st.write(prompt)
-        resp = r.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": "openrouter/free",
-                "messages": [{"role": "user", "content": realPrompt}],
-            },
-        )
-        with st.chat_message("Stockinator.ai"):
-            st.write(f"{resp.json()['choices'][0]['message']['content']}")
 
 
 with st.sidebar:
