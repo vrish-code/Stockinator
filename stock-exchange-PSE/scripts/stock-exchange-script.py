@@ -142,6 +142,7 @@ if "stock_dict" not in st.session_state:
                     21846.1,
                 ],
             },
+        
         },
         "Bought stocks": {},
         "Sold stocks": {},
