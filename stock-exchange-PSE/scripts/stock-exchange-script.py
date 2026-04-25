@@ -33,15 +33,6 @@ with open(r"C:\Users\karth\OneDrive\Desktop\apikey.json", "r", encoding="utf-8")
     apikeys = json.load(f)
 
 
-def save(data):
-
-    save_json = r.put(
-        "https://api.jsonstorage.net/v1/json/437555fb-6879-4dcc-b086-0b559e9e8e49/b7742efe-514a-4bb0-b2fb-caca14793ac6?",
-        json=data,
-        headers={"Content-Type": "application/json", "apiKey": apikeys["api-key-json"]},
-    )
-
-
 instructions = [
     "Do not click on the same stock in buy or sell twice.",
     "Do not misuse the chatbot.",
@@ -49,8 +40,8 @@ instructions = [
     "All values are simulated, not real. No changes happen to a real bank account.",
 ]
 
-if "stock_dict" not in st.session_state:
-    st.session_state.stock_dict = {
+if "userDict" not in st.session_state:
+    st.session_state.userDict = {
         "Bought stocks": {},
         "Sold stocks": {},
         "Bank account": {"Balance": 100000000.676767 + random.randint(-10000, 100000)},
@@ -111,7 +102,7 @@ if "stock_dict" not in st.session_state:
             ]
         ),
     }
-save(st.session_state.stock_dict)
+
 if "availableStocks" not in st.session_state:
     st.session_state.availableStocks = {
         "RELIANCE": {
@@ -185,7 +176,9 @@ if "stock_df" not in st.session_state:
 
 
 def buying_and_stats():
-    st.title("View stocks!")
+    st.title("View available stocks!")
+    st.divider()
+    st.subheader(f"Welcome, {st.session_state.userDict["Name"]}! ")
     tl = list(st.session_state.availableStocks.keys())
     pl = list(x["Price (1 share)"] for x in st.session_state.availableStocks.values())
 
@@ -209,7 +202,7 @@ def buying_and_stats():
                 which="both",
                 color="#fff",
             )
-            a.set_xlim(0, 50000)
+            a.set_xlim(0, 100000)
             a.set_title("Chart on prices of stocks")
             a.set_xlabel("Prices")
             a.set_ylabel("Tickers")
@@ -273,29 +266,37 @@ def buying_and_stats():
                 )
 
             if s:
-                st.session_state.stock_dict["Bought stocks"][buyStock] = c.deepcopy(
+                st.session_state.userDict["Bought stocks"][buyStock] = c.deepcopy(
                     st.session_state.availableStocks[buyStock]
                 )
-                st.session_state.stock_dict["Bought stocks"][buyStock][
+                st.session_state.userDict["Bought stocks"][buyStock][
                     "No of shares bought"
                 ] = noS
-                st.session_state.stock_dict["Demat"][buyStock] = 0
-                st.session_state.stock_dict["Demat"][buyStock] += (
-                    st.session_state.stock_dict[buyStock]["Price (1 share)"] * noS
+                st.session_state.userDict["Demat"][buyStock] = 0
+                st.session_state.userDict["Demat"][buyStock] += (
+                    st.session_state.userDict["Bought stocks"][buyStock][
+                        "Price (1 share)"
+                    ]
+                    * noS
                 ) * (
-                    st.session_state.stock_dict[buyStock]["Return Percentage 1 yr"]
+                    st.session_state.userDict["Bought stocks"][buyStock][
+                        "Return Percentage 1 yr"
+                    ]
                     / 100
                 ) + (
-                    st.session_state.stock_dict[buyStock]["Price (1 share)"] * noS
+                    st.session_state.userDict["Bought stocks"][buyStock][
+                        "Price (1 share)"
+                    ]
+                    * noS
                 )
-                st.session_state.stock_dict["Bank account"]["Balance"] -= (
+                st.session_state.userDict["Bank account"]["Balance"] -= (
                     st.session_state.availableStocks[buyStock]["Price (1 share)"]
-                    * st.session_state.stock_dict["Bought stocks"][buyStock][
+                    * st.session_state.userDict["Bought stocks"][buyStock][
                         "No of shares bought"
                     ]
                 )
-                save(st.session_state.stock_dict)
                 st.success(f"You bought {buyStock}!")
+                st.divider()
 
 
 def return_calc():
@@ -319,13 +320,13 @@ def return_calc():
         st.divider()
 
         st.write(
-            f"Return percentage (1 yr) for selected stock: {st.session_state.stock_dict[stock_choice]['Return Percentage 1 yr']}"
+            f"Return percentage (1 yr) for selected stock: {st.session_state.userDict[stock_choice]['Return Percentage 1 yr']}"
         )
         st.divider()
 
         ret_output = (
-            st.session_state.stock_dict[stock_choice]["Price (1 share)"] * noShares
-        ) * (st.session_state.stock_dict[stock_choice]["Return Percentage 1 yr"] / 100)
+            st.session_state.userDict[stock_choice]["Price (1 share)"] * noShares
+        ) * (st.session_state.userDict[stock_choice]["Return Percentage 1 yr"] / 100)
 
         st.metric("Return output", f"₹{ret_output}")
         st.divider()
@@ -334,11 +335,11 @@ def return_calc():
 def chatbot():
     with st.container(border=True):
         prompt = st.chat_input("Enter a prompt")
-    realPrompt = f"Stocks available:{st.session_state.availableStocks}, Bought stocks: {st.session_state.stock_dict["Bought stocks"]}, Sold stocks: {st.session_state.stock_dict["Sold stocks"]}, bank account: {st.session_state.stock_dict["Bank account"]}, demat account: {st.session_state.stock_dict["Demat"]}, {prompt}"
+    realPrompt = f"Stocks available:{st.session_state.availableStocks}, Bought stocks: {st.session_state.userDict["Bought stocks"]}, Sold stocks: {st.session_state.userDict["Sold stocks"]}, bank account: {st.session_state.userDict["Bank account"]}, demat account: {st.session_state.userDict["Demat"]}, {prompt}"
     with st.container(border=True):
         with st.chat_message("Stockinator.ai", avatar="🤖"):
             st.write("How can I help you?")
-        with st.chat_message(st.session_state.stock_dict["name"], avatar="👤"):
+        with st.chat_message(st.session_state.userDict["Name"], avatar="👤"):
             st.write(prompt)
         resp = r.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -351,19 +352,21 @@ def chatbot():
                 "messages": [{"role": "user", "content": realPrompt}],
             },
         )
-        with st.chat_message("Stockinator.ai"):
-            st.write(f"{resp.json()['choices'][0]['message']['content']}")
+        if resp.status_code == 200:
+            with st.chat_message("Stockinator.ai"):
+                st.write(f"{resp.json()['choices'][0]['message']['content']}")
 
 
 def portfolio_and_selling():
     st.header("Portfolio")
     st.divider()
-    if len(st.session_state.stock_dict["Bought stocks"]) != 0:
+    st.subheader(f"Welcome, {st.session_state.userDict["Name"]}!")
+    if len(st.session_state.userDict["Bought stocks"]) != 0:
         totInv = float(
             sum(
-                st.session_state.stock_dict["Bought stocks"][a]["Price (1 share)"]
-                * st.session_state.stock_dict["Bought stocks"][a]["No of shares bought"]
-                for a in st.session_state.stock_dict["Bought stocks"]
+                st.session_state.userDict["Bought stocks"][a]["Price (1 share)"]
+                * st.session_state.userDict["Bought stocks"][a]["No of shares bought"]
+                for a in st.session_state.userDict["Bought stocks"]
             )
         )
         totPL = sum(
@@ -371,7 +374,7 @@ def portfolio_and_selling():
             / 100
             * s["Price (1 share)"]
             * s["No of shares bought"]
-            for s in st.session_state.stock_dict["Bought stocks"].values()
+            for s in st.session_state.userDict["Bought stocks"].values()
         )
         totRet = totPL / totInv * 100
         totPortVal = totInv + totPL
@@ -387,52 +390,74 @@ def portfolio_and_selling():
             with st.expander("Total Realised P/L"):
                 st.metric(
                     "Total Realised P/L",
-                    f"{st.session_state.stock_dict["Realised PL"]:.2f} INR",
+                    f"{st.session_state.userDict["realisedPL"]:.2f} INR",
                 )
             with st.expander("Bank account balance"):
-                dTL = list(st.session_state.stock_dict["Demat"].keys())
-                T = st.tabs(dTL)
-                for t in T:
-                    for i in range(len(dTL)):
-                        with t:
-                            st.metric(f"Demat holding for {dTL[i]}")
-            with st.expander("Demat account"):
-                st.json(st.session_state.stock_dict["Demat"])
-        c1, c2 = st.columns(2, border=True, gap="large")
-        with c1:
-            st.subheader("Stock overview")
-            st.divider()
+                st.metric(
+                    f"Bank account balance for {st.session_state.userDict["Name"]}",
+                    f"{st.session_state.userDict["Bank account"]["Balance"]} INR",
+                )
+            with st.expander("Demat"):
+                dTL = list(st.session_state.userDict["Demat"].keys())
+                for i in range(len(dTL)):
+                    st.metric(
+                        f"Demat holding for {dTL[i]}",
+                        f"{st.session_state.userDict["Demat"][dTL[i]]:.2f} INR",
+                    )
+                    st.divider()
+
+        t1, t2 = st.tabs(["Stock overview", "Selling"])
+        with t1:
             with st.container(border=True):
-                sList = list(st.session_state.stock_dict["Bought stocks"].keys())
-                for i in st.session_state.stock_dict["Bought stocks"]:
+                st.subheader("Stock overview")
+                st.divider()
+                t3, t4 = st.tabs(
+                    [
+                        "Overview of all bought stocks",
+                        "6 month histories of all bought stocks",
+                    ]
+                )
+                with t3:
                     with st.container(border=True):
-                        st.subheader(sList[sList.index(i)])
-                        bSDf = pd.DataFrame(
-                            list(
-                                st.session_state.stock_dict["Bought stocks"][i].items(),
-                            ),
-                            columns=["Categories", "Details"],
-                        )
-                        st.dataframe(bSDf, hide_index=True)
+                        sList = list(st.session_state.userDict["Bought stocks"].keys())
+                        for i in st.session_state.userDict["Bought stocks"]:
+                            with st.container(border=True):
+                                st.subheader(sList[sList.index(i)])
+                                bSDf = pd.DataFrame(
+                                    list(
+                                        st.session_state.userDict["Bought stocks"][
+                                            i
+                                        ].items(),
+                                    ),
+                                    columns=["Categories", "Details"],
+                                )
+                                st.dataframe(bSDf, hide_index=True)
+                with t4:
+                    with st.container(border=True):
+                        for i in st.session_state.userDict["Bought stocks"]:
+                            with st.container(border=True):
+                                st.caption(
+                                    f"6 month history for {st.session_state.userDict["Bought stocks"][i][
+                                    "6 month history"
+                                ]}"
+                                )
+                                st.line_chart(
+                                    st.session_state.userDict["Bought stocks"][i][
+                                        "6 month history"
+                                    ]
+                                )
+        with t2:
             with st.container(border=True):
-                for i in st.session_state.stock_dict["Bought stocks"]:
-                    with st.container(border=True):
-                        st.line_chart(
-                            st.session_state.stock_dict["Bought stocks"][i][
-                                "6 month history"
-                            ]
-                        )
-        with c2:
-            st.subheader("Selling")
+                st.subheader("Selling")
             with st.container(border=True):
                 sellStock = st.selectbox(
                     "Choose a stock to sell",
-                    list(st.session_state.stock_dict["Bought stocks"].keys()),
+                    list(st.session_state.userDict["Bought stocks"].keys()),
                 )
                 noS = st.number_input(
                     "How many shares do you want to sell?",
                     1,
-                    st.session_state.stock_dict["Bought stocks"][sellStock][
+                    st.session_state.userDict["Bought stocks"][sellStock][
                         "No of shares bought"
                     ],
                 )
@@ -440,72 +465,72 @@ def portfolio_and_selling():
                 if sellConf:
                     if (
                         noS
-                        == st.session_state.stock_dict["Bought stocks"][sellStock][
+                        == st.session_state.userDict["Bought stocks"][sellStock][
                             "No of shares bought"
                         ]
                     ):
-                        st.session_state.stock_dict["Sold stocks"][sellStock] = (
-                            st.session_state.stock_dict["Bought stocks"][sellStock]
+                        st.session_state.userDict["Sold stocks"][sellStock] = (
+                            st.session_state.userDict["Bought stocks"][sellStock]
                         )
-                        del st.session_state_bought_stocks[sellStock]
-                        st.session_state.stock_dict["Bank account"][
+                        del st.session_state.userDict["Bought stocks"][sellStock]
+                        st.session_state.userDict["Bank account"][
                             "Balance"
-                        ] += st.session_state.stock_dict["Demat"][sellStock]
+                        ] += st.session_state.userDict["Demat"][sellStock]
                         st.success(f"You sold {sellStock}!")
-                    if (
+                    elif (
                         noS
-                        != st.session_state.stock_dict["Bought stocks"][sellStock][
-                            "No of shares"
+                        != st.session_state.userDict["Bought stocks"][sellStock][
+                            "No of shares bought"
                         ]
                     ):
-                        st.session_state.stock_dict["Bought stocks"][
+                        st.session_state.userDict["Bought stocks"][sellStock][
                             "No of shares bought"
                         ] -= noS
-                        st.session_state.stock_dict["Sold stocks"][sellStock] = (
-                            st.session_state.stock_dict["Bought stocks"][sellStock]
+                        st.session_state.userDict["Sold stocks"][sellStock] = (
+                            st.session_state.userDict["Bought stocks"][sellStock]
                         )
-                        st.session_state.stock_dict["Sold stocks"][sellStock][
+                        st.session_state.userDict["Sold stocks"][sellStock][
                             "No of shares bought"
                         ] = noS
-                        st.session_state.stock_dict["Bank account"] += (
-                            st.session_state.stock_dict["Bought stocks"][sellStock][
+                        st.session_state.userDict["Bank account"]["Balance"] += (
+                            st.session_state.userDict["Bought stocks"][sellStock][
                                 "Price (1 share)"
                             ]
                             * noS
                         ) * (
-                            st.session_state.stock_dict["Bought stocks"][sellStock][
+                            st.session_state.userDict["Bought stocks"][sellStock][
                                 "Return Percentage 1 yr"
                             ]
                             / 100
                         ) + (
-                            st.session_state.stock_dict["Bought stocks"][sellStock][
+                            st.session_state.userDict["Bought stocks"][sellStock][
                                 "Price (1 share)"
                             ]
                             * noS
                         )
-                        st.session_state.stock_dict["Demat"][sellStock] = 0
-                        st.session_state.stock_dict["Demat"][sellStock] = (
+                        st.session_state.userDict["Demat"][sellStock] = 0
+                        st.session_state.userDict["Demat"][sellStock] = (
                             (
-                                st.session_state.stock_dict["Bought stocks"][sellStock][
+                                st.session_state.userDict["Bought stocks"][sellStock][
                                     "Price (1 share)"
                                 ]
                                 * noS
                             )
                             * (
-                                st.session_state.stock_dict["Bought stocks"][sellStock][
+                                st.session_state.userDict["Bought stocks"][sellStock][
                                     "Return Percentage 1 yr"
                                 ]
                                 / 100
                             )
                             + (
-                                st.session_state.stock_dict["Bought stocks"][sellStock][
+                                st.session_state.userDict["Bought stocks"][sellStock][
                                     "Price (1 share)"
                                 ]
                                 * noS
                             )
                             - noS
                         )
-                        save(st.session_state.stock_dict)
+            st.divider()
 
     else:
         st.error("No stocks bought!")
