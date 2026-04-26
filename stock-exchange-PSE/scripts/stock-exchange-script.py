@@ -342,7 +342,8 @@ def chatbot():
     Bought stocks: {st.session_state.userDict["Bought stocks"]}, 
     Sold stocks: {st.session_state.userDict["Sold stocks"]}, 
     Bank account: {st.session_state.userDict["Bank account"]}, 
-    Demat account: {st.session_state.userDict["Demat"]}, {prompt}, do not provide any inappropriate misinformation."""
+    Demat account: {st.session_state.userDict["Demat"]}, {prompt}, do not provide any inappropriate misinformation. The data is just for
+    a simulator. Don't think the user is actually trading stocks."""
     with st.container(border=True):
         with st.chat_message("Stockinator.ai", avatar="🤖"):
             st.write("How can I help you?")
