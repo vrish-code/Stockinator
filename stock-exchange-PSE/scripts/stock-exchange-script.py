@@ -3,7 +3,6 @@ import random
 import streamlit as st
 import pandas as pd
 import requests as r
-import json
 import copy as c
 
 st.set_page_config(
@@ -40,67 +39,15 @@ instructions = [
     "Use the dropdowns for selecting stocks.",
     "Use the expanders for viewing your portfolio data at a glance.",
 ]
-
+if "gender" not in st.session_state:
+    st.session_state.gender = ""
 if "userDict" not in st.session_state:
     st.session_state.userDict = {
         "Bought stocks": {},
         "Sold stocks": {},
         "Bank account": {"Balance": 100000000.676767 + random.randint(-10000, 100000)},
         "Demat": {},
-        "Name": random.choice(
-            [
-                "Liam",
-                "Olivia",
-                "Noah",
-                "Emma",
-                "Oliver",
-                "Charlotte",
-                "James",
-                "Amelia",
-                "Elijah",
-                "Sophia",
-                "William",
-                "Isabella",
-                "Henry",
-                "Ava",
-                "Lucas",
-                "Mia",
-                "Benjamin",
-                "Evelyn",
-                "Theodore",
-                "Luna",
-                "Mateo",
-                "Harper",
-                "Levi",
-                "Sofia",
-                "Sebastian",
-                "Scarlett",
-                "Daniel",
-                "Elizabeth",
-                "Jack",
-                "Eleanor",
-                "Wyatt",
-                "Chloe",
-                "Alexander",
-                "Layla",
-                "Owen",
-                "Mila",
-                "Asher",
-                "Alice",
-                "Samuel",
-                "Hazel",
-                "Ethan",
-                "Claire",
-                "Leo",
-                "Ivy",
-                "Jackson",
-                "Aurora",
-                "Mason",
-                "Penelope",
-                "Ezra",
-                "Elena",
-            ]
-        ),
+        "Name": "",
     }
 
 if "availableStocks" not in st.session_state:
@@ -173,6 +120,75 @@ if "stock_df" not in st.session_state:
         .reset_index()
         .rename(columns={"index": "Ticker"})
     )
+
+
+def gender_selection():
+    gendSelect = st.segmented_control("Choose a gender", ["Boy", "Girl"], required=True)
+    st.session_state.gender = gendSelect
+    if gendSelect == "Boy":
+        st.session_state.userDict["Name"] = random.choice(
+            [
+                "Liam",
+                "Noah",
+                "Oliver",
+                "James",
+                "Elijah",
+                "William",
+                "Henry",
+                "Lucas",
+                "Benjamin",
+                "Theodore",
+                "Mateo",
+                "Levi",
+                "Sebastian",
+                "Daniel",
+                "Jack",
+                "Wyatt",
+                "Alexander",
+                "Owen",
+                "Asher",
+                "Samuel",
+                "Ethan",
+                "Leo",
+                "Jackson",
+                "Mason",
+                "Ezra",
+            ]
+        )
+
+    elif gendSelect == "Girl":
+        st.session_state.userDict["Name"] = random.choice(
+            girls=[
+                "Olivia",
+                "Emma",
+                "Charlotte",
+                "Amelia",
+                "Sophia",
+                "Isabella",
+                "Ava",
+                "Mia",
+                "Evelyn",
+                "Luna",
+                "Harper",
+                "Sofia",
+                "Scarlett",
+                "Elizabeth",
+                "Eleanor",
+                "Chloe",
+                "Layla",
+                "Mila",
+                "Alice",
+                "Hazel",
+                "Claire",
+                "Ivy",
+                "Aurora",
+                "Penelope",
+                "Elena",
+            ]
+        )
+    else:
+        del st.session_state.gender
+        del st.session_state.userDict["Name"]
 
 
 def buying_and_stats():
