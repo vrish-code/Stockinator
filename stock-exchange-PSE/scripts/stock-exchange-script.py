@@ -40,14 +40,74 @@ instructions = [
     "Use the expanders for viewing your portfolio data at a glance.",
 ]
 if "gender" not in st.session_state:
-    st.session_state.gender = ""
+    st.session_state.gender = random.choice(["Boy", "Girl"])
 if "userDict" not in st.session_state:
     st.session_state.userDict = {
         "Bought stocks": {},
         "Sold stocks": {},
         "Bank account": {"Balance": 100000000.676767 + random.randint(-10000, 100000)},
         "Demat": {},
-        "Name": "",
+        "Name": (
+            random.choice(
+                [
+                    "Liam",
+                    "Noah",
+                    "Oliver",
+                    "James",
+                    "Elijah",
+                    "William",
+                    "Henry",
+                    "Lucas",
+                    "Benjamin",
+                    "Theodore",
+                    "Mateo",
+                    "Levi",
+                    "Sebastian",
+                    "Daniel",
+                    "Jack",
+                    "Wyatt",
+                    "Alexander",
+                    "Owen",
+                    "Asher",
+                    "Samuel",
+                    "Ethan",
+                    "Leo",
+                    "Jackson",
+                    "Mason",
+                    "Ezra",
+                ]
+            )
+            if st.session_state.gender == "Boy"
+            else random.choice(
+                [
+                    "Olivia",
+                    "Emma",
+                    "Charlotte",
+                    "Amelia",
+                    "Sophia",
+                    "Isabella",
+                    "Ava",
+                    "Mia",
+                    "Evelyn",
+                    "Luna",
+                    "Harper",
+                    "Sofia",
+                    "Scarlett",
+                    "Elizabeth",
+                    "Eleanor",
+                    "Chloe",
+                    "Layla",
+                    "Mila",
+                    "Alice",
+                    "Hazel",
+                    "Claire",
+                    "Ivy",
+                    "Aurora",
+                    "Penelope",
+                    "Elena",
+                ]
+            )
+        ),
     }
 
 if "availableStocks" not in st.session_state:
@@ -120,76 +180,6 @@ if "stock_df" not in st.session_state:
         .reset_index()
         .rename(columns={"index": "Ticker"})
     )
-
-
-def gender_selection():
-    st.empty()
-    gendSelect = st.segmented_control("Choose a gender", ["Boy", "Girl"], required=True)
-    st.session_state.gender = gendSelect
-    if gendSelect == "Boy":
-        st.session_state.userDict["Name"] = random.choice(
-            [
-                "Liam",
-                "Noah",
-                "Oliver",
-                "James",
-                "Elijah",
-                "William",
-                "Henry",
-                "Lucas",
-                "Benjamin",
-                "Theodore",
-                "Mateo",
-                "Levi",
-                "Sebastian",
-                "Daniel",
-                "Jack",
-                "Wyatt",
-                "Alexander",
-                "Owen",
-                "Asher",
-                "Samuel",
-                "Ethan",
-                "Leo",
-                "Jackson",
-                "Mason",
-                "Ezra",
-            ]
-        )
-
-    elif gendSelect == "Girl":
-        st.session_state.userDict["Name"] = random.choice(
-            girls=[
-                "Olivia",
-                "Emma",
-                "Charlotte",
-                "Amelia",
-                "Sophia",
-                "Isabella",
-                "Ava",
-                "Mia",
-                "Evelyn",
-                "Luna",
-                "Harper",
-                "Sofia",
-                "Scarlett",
-                "Elizabeth",
-                "Eleanor",
-                "Chloe",
-                "Layla",
-                "Mila",
-                "Alice",
-                "Hazel",
-                "Claire",
-                "Ivy",
-                "Aurora",
-                "Penelope",
-                "Elena",
-            ]
-        )
-    else:
-        st.session_state.gender = None
-        st.session_state.userDict["Name"] = None
 
 
 def buying_and_stats():
@@ -574,7 +564,6 @@ def inStructions():
     )
 
 
-gender_selection()
 with st.sidebar:
     choiceList = [
         "View stock stats and buy some stocks",
