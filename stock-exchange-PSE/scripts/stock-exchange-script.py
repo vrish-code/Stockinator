@@ -126,7 +126,7 @@ def selectNameAge():
     st.empty()
     with st.container(border=True):
         name = st.text_input("Enter your name")
-        age = st.slider("Select your age", 6, None, None, 6, 1, None)
+        age = st.slider(label="Select your age", min=6, max=100, step=1, value=6)
     st.session_state.userDict["Age"] = age
     st.session_state.userDict["Name"] = name
 
