@@ -124,17 +124,16 @@ if "stock_df" not in st.session_state:
 
 def selectNameAge():
     ph = st.empty()
-    selectNameAge.has_run = True
-    with st.container(border=True):
-        name = st.text_input("Enter your name")
-        age = st.slider(
-            label="Select your age", min_value=6, max_value=100, step=1, value=6
-        )
-    if name and age:
-        st.session_state.userDict["Age"] = age
-        st.session_state.userDict["Name"] = name
-        st.success("Name and age updated!")
-        ph.empty()
+    with ph:
+        with st.container(border=True):
+            name = st.text_input("Enter your name")
+            age = st.slider(
+                label="Select your age", min_value=6, max_value=100, step=1, value=6
+            )
+        if name and age:
+            st.session_state.userDict["Age"] = age
+            st.session_state.userDict["Name"] = name
+            st.success("Name and age updated!")
 
 
 def buyingAndStats():
