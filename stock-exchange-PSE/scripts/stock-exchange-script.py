@@ -314,7 +314,7 @@ def buyingAndStats():
                     with i:
                         st.line_chart(
                             st.session_state.availableStocks[k]["6 month history"],
-                            x=f"{tickerList[j]}",
+                            x=f"{k}",
                             y="Price Trend (6 months)",
                             color="#176d74",
                         )
