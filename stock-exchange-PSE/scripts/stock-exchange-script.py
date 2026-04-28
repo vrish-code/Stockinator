@@ -182,7 +182,7 @@ if "stock_df" not in st.session_state:
     )
 
 
-def buying_and_stats():
+def buyingAndStats():
     st.title("View available stocks!")
     st.divider()
     st.subheader(f"Welcome, {st.session_state.userDict["Name"]}! ")
@@ -386,7 +386,7 @@ def chatbot():
                         st.write(f"{resp.json()['choices'][0]['message']['content']}")
 
 
-def portfolio_and_selling():
+def portfolioAndSelling():
 
     st.header("Portfolio")
     st.divider()
@@ -590,9 +590,9 @@ with st.sidebar:
         choiceList,
     )
 if a == choiceList[0]:
-    buying_and_stats()
+    buyingAndStats()
 if a == choiceList[2]:
-    portfolio_and_selling()
+    portfolioAndSelling()
 if a == choiceList[3]:
     chatbot()
 if a == choiceList[1]:
