@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import requests as r
 import copy as c
+import bankingProgram as b
 
 st.set_page_config(
     page_title="StockyBankySimulator",
