@@ -51,8 +51,6 @@ if "userDict" not in st.session_state:
         },
         "No of withdrawals": 0,
         "No of deposits": 0,
-        "Total amount withdrawn": 0,
-        "Total amount deposited": 0,
         "Withdrawals": [],
         "Deposits": [],
         "PIN": 9632,
@@ -891,8 +889,61 @@ def inStructions():
 
 
 def bankManagement():
+    names = [
+        "Liam",
+        "Noah",
+        "Oliver",
+        "James",
+        "Elijah",
+        "William",
+        "Henry",
+        "Lucas",
+        "Benjamin",
+        "Theodore",
+        "Mateo",
+        "Levi",
+        "Sebastian",
+        "Daniel",
+        "Jack",
+        "Wyatt",
+        "Alexander",
+        "Owen",
+        "Asher",
+        "Samuel",
+        "Ethan",
+        "Leo",
+        "Jackson",
+        "Mason",
+        "Ezra",
+        "Olivia",
+        "Emma",
+        "Charlotte",
+        "Amelia",
+        "Sophia",
+        "Isabella",
+        "Ava",
+        "Mia",
+        "Evelyn",
+        "Luna",
+        "Harper",
+        "Sofia",
+        "Scarlett",
+        "Elizabeth",
+        "Eleanor",
+        "Chloe",
+        "Layla",
+        "Mila",
+        "Alice",
+        "Hazel",
+        "Claire",
+        "Ivy",
+        "Aurora",
+        "Penelope",
+        "Elena",
+    ]
+
     class withDraw:
-        def __init__(self, name, amount, withdrawalNo):
+        def __init__(self, name: str, amount: float, withdrawalNo: int):
             self.name = name
             self.amount = amount
             self.withdrawalNo = withdrawalNo
@@ -907,7 +958,41 @@ def bankManagement():
         def celebrate():
             st.success("Withdrawal successful!")
 
-    c1, c2 = st.columns(2, border=True)
+    class deposit:
+        def __init__(self, name: str, amount: float, depositNo: int):
+            self.name = name
+            self.amount = amount
+            self.withdrawalNo = depositNo
+
+        def __dict__(self):
+            return {
+                "Name": self.name,
+                "Amount": self.amount,
+                "Deposit number": self.depositNo,
+            }
+
+        def celebrate():
+            st.success("Deposit successful!")
+
+    class transaction:
+        def __init__(self, name: str, amount: float, transactionNo: int, receiver: str):
+            self.name = name
+            self.amount = amount
+            self.withdrawalNo = transactionNo
+            self.receiver = receiver
+
+        def __dict__(self):
+            return {
+                "Name": self.name,
+                "Amount": self.amount,
+                "Transaction number": self.transactionNo,
+                "Receiver": self.receiver,
+            }
+
+        def celebrate():
+            st.success("Transaction successful!")
+
+    c1, c2, c3 = st.columns(3, border=True)
     with c1:
         st.subheader("Withdrawals here!")
         st.divider()
@@ -916,13 +1001,31 @@ def bankManagement():
             pin = int(st.text_input("Enter your PIN", type="password"))
             amountWithdrawn = st.slider(
                 label="How much do you want to withdraw",
-                min=100,
+                min=1.00,
                 max=st.session_state.userDict["Bank account balance"],
                 step=1,
             )
         if withdrawalName and pin and amountWithdrawn:
             if pin == st.session_state.userDict["PIN"]:
-                withdrawal = None
+                withdrawal = withDraw(
+                    withdrawalName, amountWithdrawn, random.randint(1000, 1000000000)
+                )
+                st.session_state.userDict["Withdrawals"].append(withdrawal)
+                withdrawal.celebrate()
+            else:
+                st.error("Enter a new PIN. The submitted PIN is wrong.")
+    with c2:
+        st.subheader("Transactions here!")
+        st.divider()
+        with st.container(border=True):
+            transactionName = st.text_input("Enter the name of your withdrawal")
+            pin = int(st.text_input("Enter your PIN", type="password"))
+            amountWithdrawn = st.slider(
+                label="How much do you want to withdraw",
+                min=1.00,
+                max=st.session_state.userDict["Bank account balance"],
+                step=1,
+            )
 
 
 with st.sidebar:
