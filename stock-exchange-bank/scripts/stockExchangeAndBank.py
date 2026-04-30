@@ -51,9 +51,11 @@ if "userDict" not in st.session_state:
         },
         "No of withdrawals": 0,
         "No of deposits": 0,
+        "No of transactions": 0,
         "Withdrawals": [],
         "Deposits": [],
-        "PIN": 9632,
+        "Transactions": [],
+        "PIN": random.randint(1000, 1000000),
         "Demat": {},
         "Name": (
             random.choice(
@@ -1010,7 +1012,9 @@ def bankManagement():
                 withdrawal = withDraw(
                     withdrawalName, amountWithdrawn, random.randint(1000, 1000000000)
                 )
-                st.session_state.userDict["Withdrawals"].append()
+                st.session_state.userDict["Withdrawals"].append(withdrawal.dict())
+                st.session_state.userDict["No of withdrawals"] += 1
+                st.session_state.userDict["Bank account balance"] -= amountWithdrawn
                 withdrawal.celebrate()
             else:
                 st.error("Enter a new PIN. The submitted PIN is wrong.")
@@ -1019,13 +1023,51 @@ def bankManagement():
         st.divider()
         with st.container(border=True):
             transactionName = st.text_input("Enter the name of your withdrawal")
-            pin = int(st.text_input("Enter your PIN", type="password"))
-            amountWithdrawn = st.slider(
-                label="How much do you want to withdraw",
+            pinTra = int(st.text_input("Enter your PIN", type="password"))
+            amountSent = st.slider(
+                label="How much do you want to send",
                 min=1.00,
                 max=st.session_state.userDict["Bank account balance"],
                 step=1,
             )
+            receiver = st.selectbox("Who do you want to send the money to?", names)
+            if transactionName and pinTra and amountSent:
+                if pin == st.session_state.userDict["PIN"]:
+                    withdrawal = transaction(
+                        withdrawalName,
+                        amountWithdrawn,
+                        random.randint(1000, 1000000000),
+                        receiver,
+                    )
+                    st.session_state.userDict["Transactions"].append(transaction.dict())
+                    st.session_state.userDict["Bank account balance"] -= amountSent
+                    st.session_state.userDict["No of transactions"] += 1
+                    withdrawal.celebrate()
+                else:
+                    st.error("Enter a new PIN. The submitted PIN is wrong.")
+    with c3:
+        st.subheader("Deposits here!")
+        st.divider()
+        with st.container(border=True):
+            DepositName = st.text_input("Enter the name of your deposit")
+            pin = int(st.text_input("Enter your PIN", type="password"))
+            amountDeposited = st.slider(
+                label="How much do you want to deposit",
+                min=1.00,
+                max=st.session_state.userDict["Bank account balance"],
+                step=1,
+            )
+        if withdrawalName and pin and amountWithdrawn:
+            if pin == st.session_state.userDict["PIN"]:
+                dep = deposit(
+                    DepositName, amountDeposited, random.randint(1000, 1000000000)
+                )
+                st.session_state.userDict["Deposits"].append(dep.dict())
+                st.session_state.userDict["Bank account balance"] += amountDeposited
+                st.session_state.userDict["No of deposits"] += 1
+                dep.celebrate()
+            else:
+                st.error("Enter a new PIN. The submitted PIN is wrong.")
 
 
 with st.sidebar:
