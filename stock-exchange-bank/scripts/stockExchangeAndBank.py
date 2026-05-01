@@ -41,7 +41,7 @@ instructions = [
     "Use the expanders for viewing your portfolio data at a glance.",
 ]
 if "gender" not in st.session_state:
-    st.session_state.gender = random.choice(["Boy", "Girl"])
+    st.session_state.gender = random.choice(['Boy", "Girl'])
 if "userDict" not in st.session_state:
     st.session_state.userDict = {
         "Bought stocks": {},
@@ -198,7 +198,7 @@ if "stock_df" not in st.session_state:
 def buyingAndStats():
     st.title("View available stocks!")
     st.divider()
-    st.subheader(f"Welcome, {st.session_state.userDict["Name"]}! ")
+    st.subheader(f"Welcome, {st.session_state.userDict['Name']}! ")
     tl = list(st.session_state.availableStocks.keys())
     pl = list(x["Price (1 share)"] for x in st.session_state.availableStocks.values())
 
@@ -376,7 +376,7 @@ def chatbot():
     a simulator. Don't think the user is actually trading stocks. Separate the stocks from the banking data (which is in a separate key in the dict) and don't show the separation in the answer. The bank balance is common for both categories. If the user asks regarding stocks, reply regarding stocks and bank balance, if the user asks regarding the banking data, reply accordingly with regards to the bank balance."""
     with st.container(border=True):
         with st.chat_message("Stockinator.ai", avatar="🤖"):
-            st.write(f"How can I help you {st.session_state.userDict["Name"]}?")
+            st.write(f"How can I help you {st.session_state.userDict['Name']}?")
         if prompt:
             with st.chat_message(st.session_state.userDict["Name"], avatar="👤"):
                 st.write(prompt)
@@ -384,7 +384,7 @@ def chatbot():
                 resp = r.post(
                     "https://openrouter.ai/api/v1/chat/completions",
                     headers={
-                        "Authorization": f"Bearer {st.secrets["apiKeyChatbot"]}",
+                        "Authorization": f"Bearer {st.secrets['apiKeyChatbot']}",
                         "Content-Type": "application/json",
                     },
                     json={
@@ -401,7 +401,7 @@ def portfolioAndSelling():
 
     st.header("Portfolio")
     st.divider()
-    st.subheader(f"Welcome, {st.session_state.userDict["Name"]}!")
+    st.subheader(f"Welcome, {st.session_state.userDict['Name']}!")
     if len(st.session_state.userDict["Bought stocks"]) != 0:
         totInv = float(
             sum(
@@ -431,19 +431,19 @@ def portfolioAndSelling():
 
             with st.expander("Bank account balance"):
                 st.metric(
-                    f"Bank account balance for {st.session_state.userDict["Name"]}",
-                    f"{st.session_state.userDict["Bank account"]["Balance"]} INR",
+                    f"Bank account balance for {st.session_state.userDict['Name']}",
+                    f"{st.session_state.userDict['Bank account']['Balance']} INR",
                 )
             with st.expander("Demat"):
                 dTL = list(st.session_state.userDict["Demat"].keys())
                 for i in range(len(dTL)):
                     st.metric(
                         f"Demat holding for {dTL[i]}",
-                        f"{st.session_state.userDict["Demat"][dTL[i]]:.2f} INR",
+                        f"{st.session_state.userDict['Demat'][dTL[i]]:.2f} INR",
                     )
                     st.divider()
 
-        t1, t2 = st.tabs(["Stock overview", "Selling"])
+        t1, t2 = st.tabs(['Stock overview", "Selling'])
         with t1:
             with st.container(border=True):
                 st.subheader("Stock overview")
@@ -466,7 +466,7 @@ def portfolioAndSelling():
                                             i
                                         ].items(),
                                     ),
-                                    columns=["Categories", "Details"],
+                                    columns=['Categories", "Details'],
                                 )
                                 st.dataframe(bSDf, hide_index=True)
                 with t4:
@@ -474,7 +474,7 @@ def portfolioAndSelling():
                         for i in st.session_state.userDict["Bought stocks"]:
                             with st.container(border=True):
                                 st.info(
-                                    f"6 month history for {st.session_state.userDict["Bought stocks"][i][
+                                    f"6 month history for {st.session_state.userDict['Bought stocks'][i][
                                     "6 month history"
                                 ]}"
                                 )
@@ -585,7 +585,7 @@ def inStructions():
     ph = st.empty()
     with ph:
         with st.container(border=True):
-            st.write(f"Your PIN is {st.session_state.userDict["PIN"]}")
+            st.write(f"Your PIN is {st.session_state.userDict['PIN']}")
             t.sleep(5)
         ph.empty()
     st.info(
@@ -787,44 +787,44 @@ def bankManagement():
                 with st.expander("Bank account balance"):
                     st.metric(
                         "Bank account balance",
-                        f"{st.session_state.userDict["Bank account"]["Balance"]} INR",
+                        f"{st.session_state.userDict['Bank account']['Balance']} INR",
                     )
                 st.divider()
                 with st.expander("No of deposits"):
                     st.metric(
                         "No of deposits",
-                        f"{st.session_state.userDict["No of deposits"]}",
+                        f"{st.session_state.userDict['No of deposits']}",
                     )
                 st.divider()
                 with st.expander("No of withdrawals"):
                     st.metric(
                         "No of withdrawals",
-                        f"{st.session_state.userDict["No of withdrawals"]}",
+                        f"{st.session_state.userDict['No of withdrawals']}",
                     )
                 st.divider()
                 with st.expander("No of transactions"):
                     st.metric(
                         "No of transactions",
-                        f"{st.session_state.userDict["No of transactions"]}",
+                        f"{st.session_state.userDict['No of transactions']}",
                     )
                 st.divider()
             with c2:
                 with st.expander("Total withdrawn"):
                     st.metric(
                         "Total withdrawn",
-                        f"{st.session_state.userDict["Total withdrawn"]} INR",
+                        f"{st.session_state.userDict['Total withdrawn']} INR",
                     )
                 st.divider()
                 with st.expander("Total deposited"):
                     st.metric(
                         "Total deposited",
-                        f"{st.session_state.userDict["Total deposited"]} INR",
+                        f"{st.session_state.userDict['Total deposited']} INR",
                     )
                 st.divider()
                 with st.expander("Total sent"):
                     st.metric(
                         "Total sent",
-                        f"{st.session_state.userDict["Total sent"]} INR",
+                        f"{st.session_state.userDict['Total sent']} INR",
                     )
                 st.divider()
         with st.container(border=True):
