@@ -437,54 +437,6 @@ if "availableStocks" not in st.session_state:
             "Return Percentage 1 yr": -45.20 - random.randint(-10, 10),
             "6 month history": [850.0, 720.5, 600.2, 420.8, 380.1, 400.0],
         },
-        "IRCTC": {
-            "Name": "Indian Railway Catering and Tourism Corporation Limited",
-            "Price (1 share)": 1000.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 65.40 - random.randint(-10, 10),
-            "6 month history": [650.0, 720.5, 840.2, 920.8, 970.1, 1000.0],
-        },
-        "HAL": {
-            "Name": "Hindustan Aeronautics Limited",
-            "Price (1 share)": 4500.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 165.20 - random.randint(-10, 10),
-            "6 month history": [1800.0, 2400.5, 3100.2, 3800.8, 4300.1, 4500.0],
-        },
-        "BEL": {
-            "Name": "Bharat Electronics Limited",
-            "Price (1 share)": 280.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 125.40 - random.randint(-10, 10),
-            "6 month history": [130.0, 165.5, 205.2, 245.8, 265.1, 280.0],
-        },
-        "TATACOMM": {
-            "Name": "Tata Communications Limited",
-            "Price (1 share)": 1850.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 32.40 - random.randint(-10, 10),
-            "6 month history": [1550.0, 1620.5, 1700.2, 1780.8, 1820.1, 1850.0],
-        },
-        "JIOFIN": {
-            "Name": "Jio Financial Services Limited",
-            "Price (1 share)": 350.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 45.80 - random.randint(-10, 10),
-            "6 month history": [240.0, 265.5, 290.2, 320.8, 340.1, 350.0],
-        },
-        "DLF": {
-            "Name": "DLF Limited",
-            "Price (1 share)": 880.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 110.20 - random.randint(-10, 10),
-            "6 month history": [450.0, 560.5, 680.2, 790.8, 850.1, 880.0],
-        },
-        "GAIL": {
-            "Name": "GAIL (India) Limited",
-            "Price (1 share)": 210.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 95.40 - random.randint(-10, 10),
-            "6 month history": [110.0, 135.5, 158.2, 182.8, 198.1, 210.0],
-        },
-        "PIDILITIND": {
-            "Name": "Pidilite Industries Limited",
-            "Price (1 share)": 2950.00 + random.randint(100, 100000),
-            "Return Percentage 1 yr": 22.10 - random.randint(-10, 10),
-            "6 month history": [2450.0, 2580.5, 2700.2, 2820.8, 2900.1, 2950.0],
-        },
     }
 
 if "stock_df" not in st.session_state:
