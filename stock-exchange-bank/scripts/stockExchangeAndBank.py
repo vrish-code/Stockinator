@@ -938,6 +938,8 @@ with st.sidebar:
             )
             st.metric("Current date", now.strftime("%B, %d, %Y"))
 
+        displayClock()
+
     choice = st.selectbox(
         "Choice",
         choiceList,
