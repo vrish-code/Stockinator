@@ -817,8 +817,8 @@ def bankManagement():
             with c2:
                 if (
                     len(st.session_state.userDict["Transactions"]) != 0
-                    and len(st.session_state.userDict["Withdrawals"]) != 0
-                    and len(st.session_state.userDict["Deposits"]) != 0
+                    or len(st.session_state.userDict["Withdrawals"]) != 0
+                    or len(st.session_state.userDict["Deposits"]) != 0
                 ):
                     with st.expander("Total withdrawn"):
                         st.metric(
@@ -840,8 +840,8 @@ def bankManagement():
                     st.divider()
         if (
             len(st.session_state.userDict["Transactions"]) != 0
-            and len(st.session_state.userDict["Withdrawals"]) != 0
-            and len(st.session_state.userDict["Deposits"]) != 0
+            or len(st.session_state.userDict["Withdrawals"]) != 0
+            or len(st.session_state.userDict["Deposits"]) != 0
         ):
             with st.container(border=True):
                 c1, c2, c3 = st.columns(3, border=True)
