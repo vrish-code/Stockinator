@@ -124,7 +124,12 @@ if "userDict" not in st.session_state:
     }
 
 if "availableStocks" not in st.session_state:
-    months = ["January", "February", "March", "April", "May", "June"]
+    monthsUnordered = ["January", "February", "March", "April", "May", "June"]
+    months = pd.Categorical(
+        monthsUnordered,
+        categories=monthsUnordered,
+        order=True,
+    )
     st.session_state.availableStocks = {
         "RELIANCE": {
             "Name": "Reliance Industries Limited",
