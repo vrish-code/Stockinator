@@ -384,7 +384,7 @@ def returnCalc():
         st.divider()
 
         st.write(
-            f"Return percentage (1 yr) for selected stock: {st.session_state.availableStocks[stock_choice]['Return Percentage 1 yr']}"
+            f"Return percentage (1 yr) for selected stock: {st.session_state.availableStocks[stock_choice]['Return Percentage 1 yr']}%"
         )
         st.divider()
 
