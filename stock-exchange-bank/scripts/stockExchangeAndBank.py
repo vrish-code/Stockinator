@@ -923,11 +923,13 @@ with st.sidebar:
             if selectedTimeZone:
                 now = datetime.now(ZoneInfo(selectedTimeZone))
             if now.hour < 12:
-                st.badge("Good morning", icon="☀️", color="yellow")
+                st.badge("Good morning", icon="☀️", color="blue")
             elif now.hour == 12:
-                st.badge("Good afternoon!", icon="🔥", color="red")
-            elif now.hour > 12 and now.hour < 20:
-                st.badge("Good evening", icon="🌅", color="yellow")
+                st.badge("Good noon!", icon="🔥", color="red")
+            elif now.hour > 12 and now.hour < 16:
+                st.badge("Good afternoon!", icon="⛱️", color="yellow")
+            elif now.hour > 12 and now.hour > 16:
+                st.badge("Good evening!", icon="🌅", color="orange")
             elif now.hour >= 20:
                 st.badge("Good night!", icon="🌕", color="blue")
             st.metric(
