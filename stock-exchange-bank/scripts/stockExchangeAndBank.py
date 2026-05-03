@@ -385,7 +385,7 @@ def returnCalc():
 
         st.metric(
             f"Return percentage (1 yr) for selected stock",
-            {st.session_state.availableStocks[stock_choice]["Return Percentage 1 yr"]},
+            f"{st.session_state.availableStocks[stock_choice]["Return Percentage 1 yr"]}%",
         )
         st.divider()
 
@@ -398,7 +398,7 @@ def returnCalc():
         with st.container(border=True):
             st.metric(
                 "Return output",
-                f"₹{ret_output:.2f}",
+                f"{ret_output:.2f} INR",
                 delta=f"{ st.session_state.availableStocks[stock_choice]["Return Percentage 1 yr"]:.2f}%",
             )
         st.divider()
